@@ -1,0 +1,20 @@
+/prep7
+csys,0
+allsel
+diff=1E-6
+*get,NMZ,node,,MXLOC,Z
+allsel
+esel,u,type,,4
+nsle,s,1
+nsel,r,loc,z,NMZ-diff,NMZ+diff
+
+*get,nnum,node,,count
+nnow=0
+
+*cfopen,NBoneSurf,
+*do,ni,1,nnum
+nnow=ndnext(nnow)
+  *vwrite,nnow,NX(nnow),NY(nnow),NZ(nnow)
+  ('N,'f15.1,', 'f15.9,', 'f15.9,', 'f15.9)
+*enddo
+

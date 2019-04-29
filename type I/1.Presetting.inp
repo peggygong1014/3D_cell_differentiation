@@ -1,0 +1,26 @@
+!先創建好 Term.db (包含原始Model, Material Properties)
+!File1: Presetting-------------------------------------------------------------------------------------
+resume,Term,db
+/prep7
+/units,SI
+allsel
+
+
+!!!Output Location
+esel,s,type,,3
+nsle,s,1
+*get,elemEnd,elem,,count
+
+*CFopen,Z_Location,txt
+eind=0
+*do,ecount,1,elemEnd
+eind=elnext(eind)
+*Vwrite,eind,NX(NELEM(eind,1)),NY(NELEM(eind,1)),NZ(NELEM(eind,1)),NX(NELEM(eind,2)),NY(NELEM(eind,2)),NZ(NELEM(eind,2)),NX(NELEM(eind,3)),NY(NELEM(eind,3)),NZ(NELEM(eind,3)),NX(NELEM(eind,4)),NY(NELEM(eind,4)),NZ(NELEM(eind,4))
+(F8.0,','E10.5,','E10.5,','E10.5,','E10.5,','E10.5,','E10.5,','E10.5,','E10.5,','E10.5,','E10.5,','E10.5,','E10.5)
+*enddo
+*CFCLOS
+
+
+
+
+save,Term,db

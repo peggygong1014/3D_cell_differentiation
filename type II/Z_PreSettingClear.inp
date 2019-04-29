@@ -1,0 +1,5 @@
+allsel
+lsclear,FE
+*GET, MXMP, MAT, all, NUM, MAX
+MPDELE,ALL,5,MXMP
+TBDELE,ALL,5,MXMP

@@ -1,0 +1,92 @@
+RESUME, Term-BAK,db,
+/prep7
+!
+allsel
+esel,u,type,,3
+edele,all
+ndele,all
+allsel
+*get,nnn,node,,count
+*get,nnn,elem,,count
+
+
+Earea=0
+*get,ean,elem,all,count
+eannow=0
+*do,ets,1,ean
+eannow=elnext(eannow)
+*get,ea,elem,eannow,volu
+Earea=Earea+ea
+*enddo
+
+et,3,239
+!KEYOPT,1,1,100001   
+emodif,all,mat,3
+emodif,all,type,3
+Day=84
+D=(15e-14)/3 !m^2/sec
+Timestep_index=20
+OutpitDataDiff=Timestep_index
+
+MP,DXX,3,D 
+MP,CSAT,3,1 
+
+allsel
+emid,all
+csys,1
+*get,mxX,node,,MXLOC,X
+*get,mnZ,node,,MNLOC,Z
+nsel,s,loc,x,mxX
+D,ALL,CONC,1
+
+allsel
+
+
+/SOLU
+ANTYPE,TRANS
+KBC,1
+OUTRES,ALL,ALL
+Time,Day*(24*60*60)
+NSUBST,Day*Timestep_index,0,0  !Substepªº¦¸¼Æ
+OUTPR,ALL,ALL,   !Print all result after substep
+
+
+SOLVE
+
+/POST1
+PLNSOL,CONC !For node
+! PLESOL,CONC !For Elem
+
+! /contour,,9,0,1/9,1
+! ANTIME,Day,0.5, ,0,0,0,0
+
+!!Data Output
+/POST1
+allsel
+ETABLE, ,CONC   !Build ETABLE
+*get,elemEnd,elem,all,count
+*do,t,1,Day
+*CFopen,Concentration_%t%,inp
+SET, , ,1, ,86400*t, ,
+ETABLE,REFL 
+eind=0
+
+*do,ecount,1,elemEnd
+eind=elnext(eind)
+*GET,econc, ELEM, eind, ETAB, CONC
+
+*if,econc,GT,1,then
+econc=1
+*endif
+*if,econc,LT,0,then
+econc=0
+*endif
+
+*vwrite,econc,
+(E20.10)
+*enddo
+
+*CFCLOS
+*enddo
+
+save,result,db

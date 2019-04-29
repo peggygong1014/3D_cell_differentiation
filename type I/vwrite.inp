@@ -1,0 +1,124 @@
+
+/POST1  
+set,last
+ETABLE, ,EPTO,1 
+ETABLE, ,EPTO,2 
+ETABLE, ,EPTO,3 
+ETABLE, ,FFLX, Y
+ETABLE, ,FFLX, X
+ETABLE, ,FFLX, Z
+ETABLE,FLO,FLOW
+ETABLE, ,EPTO,X  !X
+ETABLE, ,EPTO,Y  !Y
+ETABLE, ,EPTO,Z  !Z
+ETABLE, ,EPTO,XY !XY shear
+ETABLE, ,EPTO,YZ !YZ shear
+ETABLE, ,EPTO,XZ !XZ shear
+ETABLE,REFL 
+*del,EPTO1,,nopr
+*del,EPTO2,,nopr
+*del,EPTO3,,nopr
+*del,FFLXY,,nopr
+*del,FFLXX,,nopr
+*del,FFLXZ,,nopr
+*del,FLO,,nopr
+*del,EPTOX,,nopr
+*del,EPTOY,,nopr
+*del,EPTOZ,,nopr
+*del,EPTOXY,,nopr
+*del,EPTOYZ,,nopr
+*del,EPTOXZ,,nopr
+*dim,EPTO1,array,elmiqr(0,14) 
+*vget,EPTO1(1,1),elem,,etab,EPTO1 
+*dim,EPTO2,array,elmiqr(0,14) 
+*vget,EPTO2(1,1),elem,,etab,EPTO2 
+*dim,EPTO3,array,elmiqr(0,14) 
+*vget,EPTO3(1,1),elem,,etab,EPTO3 
+*dim,FFLXY,array,elmiqr(0,14) 
+*vget,FFLXY(1,1),elem,,etab,FFLXY 
+*dim,FFLXX,array,elmiqr(0,14) 
+*vget,FFLXX(1,1),elem,,etab,FFLXX 
+*dim,FFLXZ,array,elmiqr(0,14) 
+*vget,FFLXZ(1,1),elem,,etab,FFLXZ 
+*dim,FLO,array,elmiqr(0,14) 
+*vget,FLO(1,1),elem,,etab,FLO 
+
+*dim,EPTOX,array,elmiqr(0,14) 
+*vget,EPTOX(1,1),elem,,etab,EPTOX 
+*dim,EPTOY,array,elmiqr(0,14) 
+*vget,EPTOY(1,1),elem,,etab,EPTOY 
+*dim,EPTOZ,array,elmiqr(0,14) 
+*vget,EPTOZ(1,1),elem,,etab,EPTOZ 
+*dim,EPTOXY,array,elmiqr(0,14) 
+*vget,EPTOXY(1,1),elem,,etab,EPTOXY 
+*dim,EPTOYZ,array,elmiqr(0,14) 
+*vget,EPTOYZ(1,1),elem,,etab,EPTOYZ 
+*dim,EPTOXZ,array,elmiqr(0,14) 
+*vget,EPTOXZ(1,1),elem,,etab,EPTOXZ 
+
+
+esel,s,type,,3
+nsle,s,1
+
+*CFopen,Z_PredictMat,txt
+eind=0
+*do,ecount,1,elemEnd
+eind=elnext(eind)
+*get,earea,elem,eind,VOLU
+EP1=EPTO1(eind,1)
+EP2=EPTO2(eind,1)
+EP3=EPTO3(eind,1)
+EPX=EPTO1(eind,1)
+EPY=EPTO2(eind,1)
+EPZ=EPTO3(eind,1)
+EPXY=EPTO1(eind,1)
+EPYZ=EPTO2(eind,1)
+EPXZ=EPTO3(eind,1)
+FLOWX=FFLXX(eind,1)
+FLOWY=FFLXY(eind,1)
+FLOWZ=FFLXZ(eind,1)
+FLOW=FLO(eind,1)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+VXSUM=0
+VYSUM=0
+VSUM=0
+! AFact=4
+! N3=NELEM(eind,3)
+! N4=NELEM(eind,4)
+! *if,N3,EQ,N4,THEN
+! AFact=3
+! *endif
+! *do,VCaculate,1,AFact
+! NNUMB=NELEM(eind,VCaculate)
+! *GET, VS, NODE, NNUMB, V, SUM
+! VXSUM=VXSUM+VX(NNUMB)
+! VYSUM=VYSUM+VY(NNUMB)
+! VSUM=VSUM+VS
+! *enddo
+! VXSUM=VXSUM/AFact
+! VYSUM=VYSUM/AFact
+! ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! NNUMB=NELEM(eind,1)
+! VXSUM=VXSUM+VX(NNUMB)
+! VYSUM=VYSUM+VY(NNUMB)
+! FLOWX=VXSUM
+! FLOWY=VYSUM
+! FLOW=VSUM
+
+
+
+*if,FLOWX,EQ,0,Then
+FLOWX=1
+*endif
+*if,FLOWY,EQ,0,Then
+FLOWY=1
+*endif
+*if,FLOWZ,EQ,0,Then
+FLOWZ=0.0000
+*endif
+
+*vwrite,eind,EP1,EP2,EP3,FLOWX,FLOWY,FLOW,EPX,EPY,EPZ,EPXY,EPYZ,EPXZ,FLOWZ
+(F10.0,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10)
+*enddo
+
+*CFCLOS

@@ -1,0 +1,273 @@
+!File2: Solve-------------------------------------------------------------------------------------
+!Matlab input teststep parameters
+!Matlab re-in point
+resume,Term,db
+SHPP,OFF
+/NERR,,99999999,
+/prep7 
+/units,SI
+allsel
+!清除先前Loading Condition及Material Properties
+/INPUT,Z_MATLAB_parameter,'inp',,, 0  
+/INPUT,preParameter,'inp',,, 0  
+! /INPUT,DOF,'inp',,, 0  
+csys,0
+*get,DOFMXZ,node,,MXLOC,Z
+esel,s,type,,4
+nsle,s,1
+nsel,r,loc,z,DOFMXZ-1E-10,DOFMXZ+1E-10
+D,all,UZ,1E-5
+esel,s,type,,3
+*get,elemEnd,elem,all,count
+
+/SOLU
+!!!Apply Loading Condition
+allsel
+csys,0
+*get,MNZ,node,all,MNLOC,Z
+*get,MXZ,node,all,MXLOC,Z
+*get,MXX,node,all,MXLOC,X
+!!!Bottom side
+esel,s,type,,1,3
+nsle,s,1
+nsel,s,loc,Z,MNZ
+D,all,UZ,0
+*get,MXX,node,all,MXLOC,X
+nsel,r,loc,x,MXX
+D,all,UY,0 !避免旋轉 
+
+csys,0
+diff=1E-5
+allsel
+*get,MXx,node,,MXLOC,X
+nsel,s,loc,x,MXx-diff,MXx+diff
+D,all,UX,0
+
+allsel
+*get,MXx,node,,MNLOC,Y
+nsel,s,loc,Y,MXx-diff,MXx+diff
+D,all,UY,0
+allsel
+
+
+! /solu
+! ANTYPE,STAT
+! NROPT,UNSYM ! Newton Raphson with unsymmetric matrices
+! TIME,T
+! deltim,T
+! KBC,0 ! ramp loading
+! OUTRES,ALL,ALL
+! EQSLV,SPAR, ,0, ,DELE   
+! NCNV,1          !設定結束分析的關鍵條件,0=不自動停止,除非結果無法在收斂
+! NLGEOM,0        !是否考慮大撓度效應,1為是
+! AUTOTS,1
+! SSTIF,ON
+! CNCHECK,ADJUST
+! CNCHECK,AUTO
+! ! CNVTOL,FLOW,1E-10
+! ! neqit,25, 0             ! Force 1 eq iteration since only nonlinearity is bonded/no sep contact
+! pred,off
+! ! dmpopt,emat,no             ! Don't combine emat file for DANSYS
+! ! dmpopt,esav,no             ! Don't combine esav file for DANSYS
+! ! nldiag,cont,iter           ! print out contact info each equilibrium iteration
+! ! resc,,none                 ! Do not keep any restart files
+! ! nsubst,5,99,1
+! ALLSEL,ALL
+! SOLVE
+
+! !!----------------1/4 一半對稱----------------------------------
+! /prep7
+! /INPUT,DOF,'inp',,, 0  
+
+! 對稱邊界條件
+! csys,0
+! diff=1E-5
+! allsel
+! *get,MXx,node,,MXLOC,X
+! nsel,s,loc,x,MXx-diff,MXx+diff
+! D,all,UX,0
+
+! allsel
+! *get,MXx,node,,MNLOC,Y
+! nsel,s,loc,Y,MXx-diff,MXx+diff
+! D,all,UY,0
+! allsel
+
+KEYOPT,6,6,2 !Stiffness change=Very aggressive
+FKN=0.01
+R,3,0,0,FKN, 0.1,0,0 
+
+/solu
+ANTYPE,STAT
+NROPT,UNSYM ! Newton Raphson with unsymmetric matrices
+TIME,T
+deltim,T
+KBC,0 ! ramp loading
+OUTRES,ALL,ALL
+EQSLV,SPAR, ,0, ,DELE   
+NCNV,1          !設定結束分析的關鍵條件,0=不自動停止,除非結果無法在收斂
+NLGEOM,0        !是否考慮大撓度效應,1為是
+AUTOTS,1
+SSTIF,ON
+CNCHECK,ADJUST
+CNCHECK,AUTO
+! CNVTOL,FLOW,1E-10
+! neqit,25, 0             ! Force 1 eq iteration since only nonlinearity is bonded/no sep contact
+pred,off
+! dmpopt,emat,no             ! Don't combine emat file for DANSYS
+! dmpopt,esav,no             ! Don't combine esav file for DANSYS
+! nldiag,cont,iter           ! print out contact info each equilibrium iteration
+! resc,,none                 ! Do not keep any restart files
+! nsubst,5,99,1
+ALLSEL,ALL
+SOLVE
+!!!------------------------------------------------------------------------
+
+/POST1  
+set,last
+ETABLE, ,EPTO,1 
+ETABLE, ,EPTO,2 
+ETABLE, ,EPTO,3 
+ETABLE, ,FFLX, Y
+ETABLE, ,FFLX, X
+ETABLE, ,FFLX, Z
+ETABLE,FLO,FLOW
+ETABLE, ,EPTO,X  !X
+ETABLE, ,EPTO,Y  !Y
+ETABLE, ,EPTO,Z  !Z
+ETABLE, ,EPTO,XY !XY shear
+ETABLE, ,EPTO,YZ !YZ shear
+ETABLE, ,EPTO,XZ !XZ shear
+ETABLE,REFL 
+*del,EPTO1,,nopr
+*del,EPTO2,,nopr
+*del,EPTO3,,nopr
+*del,FFLXY,,nopr
+*del,FFLXX,,nopr
+*del,FFLXZ,,nopr
+*del,FLO,,nopr
+*del,EPTOX,,nopr
+*del,EPTOY,,nopr
+*del,EPTOZ,,nopr
+*del,EPTOXY,,nopr
+*del,EPTOYZ,,nopr
+*del,EPTOXZ,,nopr
+*dim,EPTO1,array,elmiqr(0,14) 
+*vget,EPTO1(1,1),elem,,etab,EPTO1 
+*dim,EPTO2,array,elmiqr(0,14) 
+*vget,EPTO2(1,1),elem,,etab,EPTO2 
+*dim,EPTO3,array,elmiqr(0,14) 
+*vget,EPTO3(1,1),elem,,etab,EPTO3 
+*dim,FFLXY,array,elmiqr(0,14) 
+*vget,FFLXY(1,1),elem,,etab,FFLXY 
+*dim,FFLXX,array,elmiqr(0,14) 
+*vget,FFLXX(1,1),elem,,etab,FFLXX 
+*dim,FFLXZ,array,elmiqr(0,14) 
+*vget,FFLXZ(1,1),elem,,etab,FFLXZ 
+*dim,FLO,array,elmiqr(0,14) 
+*vget,FLO(1,1),elem,,etab,FLO 
+
+*dim,EPTOX,array,elmiqr(0,14) 
+*vget,EPTOX(1,1),elem,,etab,EPTOX 
+*dim,EPTOY,array,elmiqr(0,14) 
+*vget,EPTOY(1,1),elem,,etab,EPTOY 
+*dim,EPTOZ,array,elmiqr(0,14) 
+*vget,EPTOZ(1,1),elem,,etab,EPTOZ 
+*dim,EPTOXY,array,elmiqr(0,14) 
+*vget,EPTOXY(1,1),elem,,etab,EPTOXY 
+*dim,EPTOYZ,array,elmiqr(0,14) 
+*vget,EPTOYZ(1,1),elem,,etab,EPTOYZ 
+*dim,EPTOXZ,array,elmiqr(0,14) 
+*vget,EPTOXZ(1,1),elem,,etab,EPTOXZ 
+
+
+esel,s,type,,3
+nsle,s,1
+
+*CFopen,Z_PredictMat,txt
+eind=0
+*do,ecount,1,elemEnd
+eind=elnext(eind)
+*get,earea,elem,eind,VOLU
+EP1=EPTO1(eind,1)
+EP2=EPTO2(eind,1)
+EP3=EPTO3(eind,1)
+EPX=EPTO1(eind,1)
+EPY=EPTO2(eind,1)
+EPZ=EPTO3(eind,1)
+EPXY=EPTO1(eind,1)
+EPYZ=EPTO2(eind,1)
+EPXZ=EPTO3(eind,1)
+FLOWX=FFLXX(eind,1)
+FLOWY=FFLXY(eind,1)
+FLOWZ=FFLXZ(eind,1)
+FLOW=FLO(eind,1)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+VXSUM=0
+VYSUM=0
+VSUM=0
+! AFact=4
+! N3=NELEM(eind,3)
+! N4=NELEM(eind,4)
+! *if,N3,EQ,N4,THEN
+! AFact=3
+! *endif
+! *do,VCaculate,1,AFact
+! NNUMB=NELEM(eind,VCaculate)
+! *GET, VS, NODE, NNUMB, V, SUM
+! VXSUM=VXSUM+VX(NNUMB)
+! VYSUM=VYSUM+VY(NNUMB)
+! VSUM=VSUM+VS
+! *enddo
+! VXSUM=VXSUM/AFact
+! VYSUM=VYSUM/AFact
+! ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! NNUMB=NELEM(eind,1)
+! VXSUM=VXSUM+VX(NNUMB)
+! VYSUM=VYSUM+VY(NNUMB)
+! FLOWX=VXSUM
+! FLOWY=VYSUM
+! FLOW=VSUM
+
+
+
+*if,FLOWX,EQ,0,Then
+FLOWX=1
+*endif
+*if,FLOWY,EQ,0,Then
+FLOWY=1
+*endif
+*if,FLOWZ,EQ,0,Then
+FLOWZ=0.0000
+*endif
+
+*vwrite,eind,EP1,EP2,EP3,FLOWX,FLOWY,FLOW,EPX,EPY,EPZ,EPXY,EPYZ,EPXZ,FLOWZ
+(F10.0,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10,',',E20.10)
+*enddo
+
+*CFCLOS
+
+
+! SEXP,F1,FFLXX,FFLXX,1,1, !F1 = FFLXX^2
+! SEXP,F2,FFLXY,FFLXY,1,1, !F2 = FFLXY^2
+! SADD,F3,F1,F2,1,-1,0,    !F3 = F1*1+F2*-1=F1-F2
+! SEXP,F4,F3,F3,1,1,       !F4 = F3^2
+! SEXP,F5,F4,F4,0.125,0.125,  !F5=F4^(1/8)*F4^(1/8)=F4^(1/4)
+
+! SADD,F31,F1,F2,1,1,0,    !F3 = F1*1+F2*1=F1+F2
+! SEXP,F41,F31,F31,1,1,       !F4 = F3^2
+! SEXP,F51,F41,F41,0.125,0.125,  !F5=F4^(1/8)*F4^(1/8)=F4^(1/4)
+! /DSCALE,1,1.0   
+
+! PLETAB,F5,NOAV  
+! PLETAB,F51,NOAV  
+! PLETAB,FFLXX,AVG
+
+
+
+
+save,Term,db
+!File3: Postprocessing-------------------------------------------------------------------------------------
+!!!MATLAB Process MP
+!!!Output MP data and element
+!!!Input Data to Ansys
